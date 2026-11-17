@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTEMIS — Water Rocket Technical Defense</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        alabaster: '#FAF9F6',
+                        sandBg: '#F4F3EC',
+                        obsidian: '#18181B',
+                        slateWarm: '#4B4B53',
+                        mutedSand: '#8C8B85',
+                        sageBorder: '#DFE4DF',
+                        sageAccent: '#6E8570',
+                        sageSoft: '#EDF2ED',
+                        champagne: '#EAE7E0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAF9F6;
+            color: #18181B;
+        }
+
+        /* Subtle Engineering Blueprint Grid + Ambient Warmth */
+        .ambient-bg {
+            background-color: #FAF9F6;
+            background-image: 
+                radial-gradient(circle at 12% 18%, rgba(223, 228, 223, 0.55) 0%, transparent 45%),
+                radial-gradient(circle at 88% 82%, rgba(234, 231, 224, 0.65) 0%, transparent 45%),
+                linear-gradient(to right, rgba(24, 24, 27, 0.025) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(24, 24, 27, 0.025) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+        }
+
+        /* Glassmorphic Header & Footer */
+        .minimal-panel {
+            background: rgba(250, 249, 246, 0.85);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-color: rgba(223, 228, 223, 0.9);
+        }
+
+        /* Assistant Message Card */
+        .minimal-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(223, 228, 223, 0.95);
+            box-shadow: 0 4px 24px -4px rgba(24, 24, 27, 0.04), 0 1px 2px rgba(24, 24, 27, 0.02);
+        }
+
+        /* User Message Bubble */
+        .minimal-card-user {
+            background: linear-gradient(135deg, #18181B 0%, #27272C 100%);
+            color: #FAF9F6;
+            box-shadow: 0 8px 24px -6px rgba(24, 24, 27, 0.2);
+        }
+
+        /* Prompt Input Box */
+        .minimal-input {
+            background: #FFFFFF;
+            border: 1px solid rgba(223, 228, 223, 0.95);
+            box-shadow: 0 10px 30px -8px rgba(24, 24, 27, 0.06);
+        }
+
+        .minimal-input:focus-within {
+            border-color: #6E8570;
+            box-shadow: 0 0 0 3px rgba(110, 133, 112, 0.14), 0 10px 30px -8px rgba(24, 24, 27, 0.06);
+        }
+
+        /* Message Entrance Animation */
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-msg {
+            animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D5DDD5;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6E8570;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col ambient-bg text-obsidian overflow-hidden selection:bg-sageSoft selection:text-obsidian">
+
+    <!-- Header Interface -->
+    <header class="w-full minimal-panel px-4 sm:px-8 py-3.5 flex items-center justify-between shrink-0 z-30 border-b">
+        <div class="flex items-center space-x-3.5">
+            <!-- Architectural Crescent Moon Emblem -->
+            <div class="relative w-10 h-10 rounded-xl bg-obsidian text-alabaster flex items-center justify-center font-mono font-bold text-base tracking-wider shadow-sm overflow-hidden">
+                <svg class="absolute -right-1.5 -top-1.5 w-7 h-7 text-sageAccent/35" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-5.4-5.4c0-1.81.89-3.42 2.26-4.4C12.92 3.04 12.46 3 12 3z"/>
+                </svg>
+                <span class="relative z-10">A</span>
+            </div>
+            
+            <div>
+                <div class="flex items-center space-x-2">
+                    <h1 class="text-base font-extrabold tracking-tight text-obsidian">ARTEMIS</h1>
+                    <span class="hidden sm:inline-block text-[10px] font-mono font-semibold uppercase tracking-widest px-2 py-0.5 rounded-md bg-sageSoft text-sageAccent border border-sageBorder">
+                        NGN-01
+                    </span>
+                </div>
+                <p class="text-[11px] text-mutedSand font-medium hidden sm:block">Water Rocket Engineering Defense System</p>
+            </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="flex items-center space-x-2 sm:space-x-3">
+            <!-- Toggle Telemetry Specs Drawer -->
+            <button onclick="toggleSpecsDrawer()" id="specs-toggle-btn" class="flex items-center space-x-1.5 bg-white hover:bg-sandBg border border-sageBorder px-3 py-1.5 rounded-xl text-xs font-medium text-obsidian transition-all shadow-2xs">
+                <svg class="w-3.5 h-3.5 text-sageAccent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Specs & Telemetry</span>
+            </button>
+
+            <!-- Reset Conversation -->
+            <button onclick="resetChat()" title="Clear Conversation" class="p-1.5 bg-white hover:bg-sandBg border border-sageBorder rounded-xl text-slateWarm hover:text-obsidian transition-all shadow-2xs">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </button>
+
+            <!-- Status Pill -->
+            <div class="hidden md:flex items-center space-x-2 bg-white border border-sageBorder px-3 py-1.5 rounded-xl shadow-2xs">
+                <span class="w-2 h-2 rounded-full bg-sageAccent animate-pulse"></span>
+                <span class="text-xs font-mono font-medium text-slateWarm">Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Collapsible Engineering Telemetry & Schematic Drawer -->
+    <div id="specs-drawer" class="hidden bg-sandBg/95 backdrop-blur-md border-b border-sageBorder px-4 sm:px-8 py-5 z-20 transition-all shadow-sm">
+        <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+            <!-- Technical Blueprint SVG -->
+            <div class="md:col-span-4 bg-white border border-sageBorder rounded-2xl p-4 flex flex-col items-center justify-center">
+                <span class="text-[10px] font-mono uppercase tracking-widest text-mutedSand mb-2">Prototype Schematic</span>
+                <svg class="w-full h-28 text-obsidian" viewBox="0 0 260 90" fill="none" stroke="currentColor">
+                    <!-- Nose Cone (14.5 cm) -->
+                    <path d="M20 45 Q50 25 85 25 L85 65 Q50 65 20 45 Z" fill="#EDF2ED" stroke="#6E8570" stroke-width="1.5"/>
+                    <!-- Ballast indicator -->
+                    <circle cx="48" cy="45" r="4" fill="#18181B"/>
+                    <text x="38" y="16" font-size="8" font-family="JetBrains Mono" fill="#4B4B53" stroke="none">14.5cm Cone</text>
+                    <!-- Main 2.26L Body -->
+                    <rect x="85" y="25" width="125" height="40" rx="4" fill="#FFFFFF" stroke="#18181B" stroke-width="1.5"/>
+                    <!-- Water Fill (~33% / 750 mL) -->
+                    <rect x="165" y="26" width="44" height="38" fill="#6E8570" fill-opacity="0.22" stroke="none"/>
+                    <text x="167" y="48" font-size="7.5" font-family="JetBrains Mono" fill="#18181B" stroke="none">750mL</text>
+                    <!-- Trapezoidal Fins -->
+                    <path d="M170 25 L195 8 L212 8 L210 25 Z" fill="#EAE7E0" stroke="#18181B" stroke-width="1.3"/>
+                    <path d="M170 65 L195 82 L212 82 L210 65 Z" fill="#EAE7E0" stroke="#18181B" stroke-width="1.3"/>
+                    <!-- Nozzle -->
+                    <path d="M210 35 L222 32 L222 58 L210 55 Z" fill="#18181B"/>
+                    <!-- Total Length Dimension Line -->
+                    <line x1="20" y1="84" x2="222" y2="84" stroke="#8C8B85" stroke-width="0.8" stroke-dasharray="2 2"/>
+                    <text x="95" y="81" font-size="8" font-family="JetBrains Mono" fill="#4B4B53" stroke="none">Total: 49 cm</text>
+                </svg>
+            </div>
+
+            <!-- Key Telemetry Metrics -->
+            <div class="md:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-white border border-sageBorder rounded-xl p-3">
+                    <div class="text-[10px] font-mono uppercase text-mutedSand">Flight Distance</div>
+                    <div class="text-lg font-bold text-obsidian mt-0.5">~55 m</div>
+                    <div class="text-[11px] text-sageAccent font-medium">Target: &gt;6 m</div>
+                </div>
+                <div class="bg-white border border-sageBorder rounded-xl p-3">
+                    <div class="text-[10px] font-mono uppercase text-mutedSand">Water Ratio</div>
+                    <div class="text-lg font-bold text-obsidian mt-0.5">~33%</div>
+                    <div class="text-[11px] text-slateWarm">750 mL / 2.26 L</div>
+                </div>
+                <div class="bg-white border border-sageBorder rounded-xl p-3">
+                    <div class="text-[10px] font-mono uppercase text-mutedSand">Fin Geometry</div>
+                    <div class="text-sm font-bold text-obsidian mt-1">3x Trapezoid</div>
+                    <div class="text-[11px] text-slateWarm">11×4×10×14 cm</div>
+                </div>
+                <div class="bg-white border border-sageBorder rounded-xl p-3">
+                    <div class="text-[10px] font-mono uppercase text-mutedSand">Total Cost</div>
+                    <div class="text-lg font-bold text-obsidian mt-0.5">~32 AED</div>
+                    <div class="text-[11px] text-slateWarm">Reused Materials</div>
+                </div>
+
+                <!-- Team Strip -->
+                <div class="col-span-2 sm:col-span-4 bg-white border border-sageBorder rounded-xl px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <span class="font-mono text-[10px] uppercase tracking-wider text-mutedSand">Engineering Team:</span>
+                    <div class="flex flex-wrap gap-x-4 gap-y-1 text-slateWarm">
+                        <span><strong class="text-obsidian">Layan Alsaid</strong> (Leader)</span>
+                        <span><strong class="text-obsidian">Isha Zainab</strong> (Devil's Advocate)</span>
+                        <span><strong class="text-obsidian">Ridit Mathur</strong> (Coordinator)</span>
+                        <span><strong class="text-obsidian">Shazia Shaik</strong> (Recorder)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat Workspace -->
+    <main class="flex-1 overflow-y-auto px-4 sm:px-8 py-6 w-full flex flex-col space-y-6 z-10" id="chat-container">
+        
+        <!-- Welcome Hero Banner -->
+        <div class="flex flex-col items-center justify-center text-center max-w-2xl mx-auto pt-4 pb-2 space-y-3">
+            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white border border-sageBorder text-[11px] font-mono text-slateWarm shadow-2xs">
+                <span class="w-1.5 h-1.5 rounded-full bg-sageAccent"></span>
+                <span>Propulsion • Aerodynamics • Stability</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-obsidian">
+                Water Rocket Project Defense
+            </h2>
+            <p class="text-xs sm:text-sm text-slateWarm max-w-md leading-relaxed">
+                Ask questions regarding thrust mechanics, fin aerodynamics, center-of-gravity balancing, and experimental test results.
+            </p>
+        </div>
+
+        <!-- Initial Greeting Message -->
+        <div class="flex flex-col items-start w-full max-w-3xl mx-auto animate-msg">
+            <div class="flex items-center space-x-2 mb-1.5 ml-1">
+                <span class="text-[11px] font-mono font-semibold text-slateWarm uppercase tracking-wider">ARTEMIS</span>
+                <span class="text-[10px] font-mono text-mutedSand">• System Ready</span>
+            </div>
+            <div class="minimal-card rounded-2xl rounded-tl-xs p-5 sm:p-6 text-sm sm:text-base text-obsidian leading-relaxed max-w-2xl">
+                Greetings. I am <strong class="font-semibold">ARTEMIS</strong>, representing <span class="text-slateWarm font-medium">Layan Alsaid, Shazia Shaik, Ridit Mathur, and Isha Zainab</span>. I am prepared to explain and scientifically defend our water rocket's design, construction, physics calculations, and flight optimization. What would you like to examine?
+            </div>
+
+            <!-- Suggested Professor Questions -->
+            <div id="suggested-prompts" class="flex flex-wrap gap-2 mt-3.5 max-w-2xl">
+                <button onclick="askSuggested('Why did you choose a 33% water fill ratio (~750 mL)?')" class="text-xs bg-white hover:bg-sageSoft text-slateWarm hover:text-obsidian border border-sageBorder px-3 py-1.5 rounded-xl transition-all shadow-2xs text-left">
+                    Why 33% water fill (~750 mL)?
+                </button>
+                <button onclick="askSuggested('How do your trapezoidal fins and nose cone ballast ensure flight stability?')" class="text-xs bg-white hover:bg-sageSoft text-slateWarm hover:text-obsidian border border-sageBorder px-3 py-1.5 rounded-xl transition-all shadow-2xs text-left">
+                    Explain fin geometry & stability
+                </button>
+                <button onclick="askSuggested('What engineering challenges did the team face and how were they solved?')" class="text-xs bg-white hover:bg-sageSoft text-slateWarm hover:text-obsidian border border-sageBorder px-3 py-1.5 rounded-xl transition-all shadow-2xs text-left">
+                    Challenges & solutions
+                </button>
+                <button onclick="askSuggested('Summarize each team member’s role in the project.')" class="text-xs bg-white hover:bg-sageSoft text-slateWarm hover:text-obsidian border border-sageBorder px-3 py-1.5 rounded-xl transition-all shadow-2xs text-left">
+                    Team roles breakdown
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Typing / Thinking Indicator -->
+    <div id="typing-indicator" class="hidden w-full px-4 sm:px-8 mb-3 shrink-0 z-10 max-w-3xl mx-auto">
+        <div class="flex flex-col items-start">
+            <span class="text-[11px] font-mono font-semibold text-slateWarm mb-1 tracking-wider uppercase ml-1">ARTEMIS</span>
+            <div class="minimal-card rounded-2xl rounded-tl-xs px-4 py-3 text-xs sm:text-sm text-slateWarm flex items-center space-x-2.5">
+                <div class="flex space-x-1">
+                    <div class="w-1.5 h-1.5 rounded-full bg-sageAccent animate-bounce" style="animation-delay: 0ms"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-sageAccent animate-bounce" style="animation-delay: 150ms"></div>
+                    <div class="w-1.5 h-1.5 rounded-full bg-sageAccent animate-bounce" style="animation-delay: 300ms"></div>
+                </div>
+                <span class="font-mono text-xs">Formulating response...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input Area -->
+    <footer class="minimal-panel border-t p-3.5 sm:p-5 shrink-0 w-full z-20">
+        <div class="max-w-3xl mx-auto w-full">
+            <div class="minimal-input rounded-2xl px-4 py-2 flex items-center transition-all">
+                <textarea id="user-input" rows="1" placeholder="Ask ARTEMIS about aerodynamics, thrust, materials, or test results..." class="flex-1 bg-transparent text-sm sm:text-base text-obsidian placeholder-mutedSand focus:outline-none resize-none max-h-32 py-2" onkeydown="handleKeyDown(event)"></textarea>
+                <button id="send-btn" onclick="sendMessage()" class="bg-obsidian hover:bg-slateWarm active:scale-95 text-alabaster font-medium text-xs sm:text-sm px-4 sm:px-5 py-2.5 rounded-xl transition-all shrink-0 ml-3 shadow-xs flex items-center space-x-1.5">
+                    <span>Ask</span>
+                    <svg class="w-3.5 h-3.5 text-alabaster" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-mutedSand font-mono mt-2 px-1">
+                <span>ARTEMIS Technical Defense Console</span>
+                <span class="hidden sm:inline">Enter to send • Shift + Enter for new line</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Application Script -->
+    <script>
+        const SYSTEM_INSTRUCTION = `You are ARTEMIS, built by Layan Alsaid, Shazia Shaik, Ridit Mathur, and Isha Zainab to independently answer our professor's questions about our water rocket project.
+
+
+
+- Goal: Explain and defend our design, physics, calculations, testing, challenges, and distance-optimization methods using provided project data and scientific principles.
+
+- Rules: Never fabricate data or decisions. Distinguish theory from experimental results. If data is missing, state what is unknown and what is needed.
+
+- Style: Confident, professional, direct, and scientifically accurate. No fluff or markdown icons. Keep answers short unless asked otherwise.
+
+- Formatting: NEVER use LaTeX syntax (no \( \), \[ \], $, \frac, \text, _{}, or ^{}). Write all equations in clean plain text using standard symbols (e.g., P_air = P_0 × (V_total / V_air), F = m × a, v² = u² + 2as).
+
+
+
+Design, Construction & Performance:
+
+- Pressure Chamber: Used a thick-walled 2.26 L Coca-Cola bottle for high pressure tolerance, large air/water volume, and a smooth profile that reduces aerodynamic drag.
+
+- Fins: Installed three equally spaced, rounded trapezoidal cardboard fins (reinforced with Scotch tape) near the nozzle using hot glue. This balances stability and drag while keeping the center of pressure behind the center of gravity.
+
+- Nose Cone & Ballast: Applied the two-bottle method by attaching the cut top section of a second bottle to the front, wrapping it in a lightweight plastic sheet for smooth airflow, and placing hot glue sticks inside to shift the center of gravity forward.
+
+- Test Result: Achieved a horizontal flight distance of ~55 meters, exceeding the 6-meter minimum requirement.
+
+
+
+Specifications, Materials & Cost:
+
+- Dimensions & Propellant: Total rocket length: 49 cm; Nose cone length: 14.5 cm; Water fill: ~33% (~750 mL).
+
+- Fin Dimensions (Trapezoidal): Root/long edge: 11 cm; Tip/short edge: 4 cm; Span/base: 10 cm; Leading/slanted edge (hypotenuse): 14 cm.
+
+- Materials & Cost: Two 2.26 L Coca-Cola bottles, 1 plastic sheet, cardboard boxes, Scotch tape, hot glue, and glue sticks. Total cost was ~32 AED by reusing household items for sustainability.
+
+
+
+Team Roles:
+
+- Layan Alsaid (Team Leader): Oversaw construction, guided aerodynamic and structural design decisions, delegated tasks collaboratively, and ensured system integration.
+
+- Isha Zainab (Devil's Advocate): Critically evaluated designs, researched alternatives, and challenged potential flaws in fin geometry, weight distribution, drag, and stability.
+
+- Ridit Mathur (Team Coordinator): Organized assembly sequencing, coordinated construction of the fins, nose cone, and body, and ensured precise measurement and alignment.
+
+- Shazia Shaik (Team Recorder): Documented design changes, construction methods, test data, and team discussions for final evaluation.
+
+
+
+Challenges & Solutions:
+
+- Materials & Cost: Chose Scotch-tape-reinforced cardboard fins over plastic or 3D printing for a lightweight, water-resistant, and cost-effective solution.
+
+- Stability & Mass Distribution: Used a two-bottle body for structural stability and added glue sticks inside the nose cone to shift the center of mass forward, counteracting rear fin weight.
+
+- Design Optimization & Teamwork: Resolved differing design opinions through research and collaborative discussion, using NASA Glenn Research Center’s water rocket simulator to test parameters and refine flight performance before finalizing the prototype.`;
+
+        const GROQ_API_KEY = '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';
+        const GROQ_MODELS = ['llama-3.3-70b-versatile', 'openai/gpt-oss-20b', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'];
+
+        let chatHistory = [];
+        let isGenerating = false;
+
+        window.onload = function() {
+            const textarea = document.getElementById('user-input');
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        };
+
+        function toggleSpecsDrawer() {
+            const drawer = document.getElementById('specs-drawer');
+            const btn = document.getElementById('specs-toggle-btn');
+            drawer.classList.toggle('hidden');
+            if (!drawer.classList.contains('hidden')) {
+                btn.classList.add('bg-sageSoft', 'border-sageAccent');
+            } else {
+                btn.classList.remove('bg-sageSoft', 'border-sageAccent');
+            }
+        }
+
+        function askSuggested(question) {
+            const inputEl = document.getElementById('user-input');
+            inputEl.value = question;
+            sendMessage();
+        }
+
+        function resetChat() {
+            if (isGenerating) return;
+            chatHistory = [];
+            const container = document.getElementById('chat-container');
+            const messages = container.querySelectorAll('.chat-turn');
+            messages.forEach(msg => msg.remove());
+            const suggestions = document.getElementById('suggested-prompts');
+            if (suggestions) suggestions.classList.remove('hidden');
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Lightweight Markdown formatter for clean bolding, bullets, and line breaks
+        function formatMarkdown(text) {
+            let safe = escapeHtml(text);
+            // Bold (**text**)
+            safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-obsidian">$1</strong>');
+            // Inline code (`code`)
+            safe = safe.replace(/`([^`]+)`/g, '<code class="font-mono text-xs bg-sandBg px-1.5 py-0.5 rounded border border-sageBorder">$1</code>');
+            // Bullet points (- item or * item)
+            safe = safe.replace(/^\s*[-*]\s+(.*)$/gm, '<div class="flex items-start space-x-2 my-1"><span class="text-sageAccent font-bold mt-0.5">•</span><span>$1</span></div>');
+            // Line breaks
+            safe = safe.replace(/\n/g, '<br>');
+            // Clean double breaks around list items
+            safe = safe.replace(/<\/div><br>/g, '</div>');
+            return safe;
+        }
+
+        function appendMessage(role, text) {
+            const container = document.getElementById('chat-container');
+            const isUser = role === 'user';
+            
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = `chat-turn flex flex-col w-full max-w-3xl mx-auto animate-msg ${isUser ? 'items-end' : 'items-start'}`;
+
+            const label = document.createElement('div');
+            label.className = `flex items-center space-x-2 mb-1.5 ${isUser ? 'mr-1' : 'ml-1'}`;
+
+            const labelText = document.createElement('span');
+            labelText.className = `text-[11px] font-mono font-semibold uppercase tracking-wider text-slateWarm`;
+            labelText.textContent = isUser ? 'PROFESSOR / USER' : 'ARTEMIS';
+            label.appendChild(labelText);
+
+            const bubble = document.createElement('div');
+            if (isUser) {
+                bubble.className = 'minimal-card-user rounded-2xl rounded-tr-xs px-5 py-3.5 text-sm sm:text-base max-w-2xl leading-relaxed';
+                bubble.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
+            } else {
+                bubble.className = 'minimal-card rounded-2xl rounded-tl-xs px-5 py-4 text-sm sm:text-base text-obsidian max-w-2xl leading-relaxed relative group pr-10';
+                bubble.innerHTML = text ? formatMarkdown(text) : '';
+            }
+
+            if (!isUser) {
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn absolute top-3 right-3 text-mutedSand hover:text-obsidian opacity-0 group-hover:opacity-100 transition p-1.5 bg-sandBg rounded-lg border border-sageBorder/60';
+                copyBtn.title = "Copy Response";
+                copyBtn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
+                copyBtn.onclick = () => {
+                    const rawText = bubble.dataset.rawText || text;
+                    copyToClipboard(rawText);
+                    copyBtn.innerHTML = `<span class="text-[10px] font-mono font-semibold text-sageAccent px-1">Copied</span>`;
+                    setTimeout(() => {
+                        copyBtn.innerHTML = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
+                    }, 2000);
+                };
+                bubble.appendChild(copyBtn);
+            }
+
+            messageWrapper.appendChild(label);
+            messageWrapper.appendChild(bubble);
+            container.appendChild(messageWrapper);
+            
+            container.scrollTop = container.scrollHeight;
+            return messageWrapper;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard?.writeText(text).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+            });
+        }
+
+        function animateTextWordByWord(bubbleElement, fullText, speed = 14) {
+            return new Promise((resolve) => {
+                bubbleElement.dataset.rawText = fullText;
+                const copyBtn = bubbleElement.querySelector('.copy-btn');
+                const words = fullText.split(' ');
+                let currentWordIndex = 0;
+                let accumulated = '';
+
+                function printNextWord() {
+                    if (currentWordIndex < words.length) {
+                        accumulated += (currentWordIndex === 0 ? '' : ' ') + words[currentWordIndex];
+                        bubbleElement.innerHTML = formatMarkdown(accumulated);
+                        if (copyBtn) bubbleElement.appendChild(copyBtn);
+                        currentWordIndex++;
+                        
+                        const container = document.getElementById('chat-container');
+                        container.scrollTop = container.scrollHeight;
+                        
+                        setTimeout(printNextWord, speed);
+                    } else {
+                        resolve();
+                    }
+                }
+                printNextWord();
+            });
+        }
+
+        function escapeHtml(string) {
+            return String(string)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        async function sendMessage() {
+            if (isGenerating) return;
+            
+            const inputEl = document.getElementById('user-input');
+            const text = inputEl.value.trim();
+            if (!text) return;
+
+            // Hide initial suggested chips once conversation starts
+            const suggestions = document.getElementById('suggested-prompts');
+            if (suggestions) suggestions.classList.add('hidden');
+
+            inputEl.value = '';
+            inputEl.style.height = 'auto';
+
+            appendMessage('user', text);
+            chatHistory.push({ role: 'user', content: text });
+
+            const typingEl = document.getElementById('typing-indicator');
+            typingEl.classList.remove('hidden');
+            const container = document.getElementById('chat-container');
+            container.scrollTop = container.scrollHeight;
+
+            isGenerating = true;
+
+            try {
+                const responseText = await callGroqAPI(chatHistory);
+                typingEl.classList.add('hidden');
+                
+                const messageRow = appendMessage('assistant', '');
+                const bubbleElement = messageRow.querySelector('.minimal-card');
+                
+                await animateTextWordByWord(bubbleElement, responseText, 14);
+                chatHistory.push({ role: 'assistant', content: responseText });
+            } catch (error) {
+                typingEl.classList.add('hidden');
+                console.error("Groq API Error:", error);
+                appendMessage('assistant', `Error processing request: ${error.message}.`);
+                chatHistory.pop();
+            } finally {
+                isGenerating = false;
+            }
+        }
+
+        async function callGroqAPI(history) {
+            const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+            const messages = [
+                { role: 'system', content: SYSTEM_INSTRUCTION },
+                ...history
+            ];
+
+            let lastError = null;
+
+            for (const model of GROQ_MODELS) {
+                const payload = {
+                    model: model,
+                    messages: messages,
+                    temperature: 0.5,
+                    max_tokens: 1024
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${GROQ_API_KEY}`
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errData = await response.json().catch(() => ({}));
+                        throw new Error(errData.error?.message || `HTTP status ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const choice = result.choices?.[0];
+                    if (choice && choice.message?.content) {
+                        return choice.message.content;
+                    } else {
+                        throw new Error("Invalid response structure from Groq API.");
+                    }
+                } catch (err) {
+                    console.warn(`Attempt with model '${model}' failed:`, err.message);
+                    lastError = err;
+                }
+            }
+
+            throw lastError || new Error("Failed to reach Groq API with available models.");
+        }
+    </script>
+</body>
+</html>
